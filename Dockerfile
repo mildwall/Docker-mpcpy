@@ -17,7 +17,7 @@ USER developer
 
 WORKDIR $HOME
 
-RUN pip install --user flask-restful==0.3.9 pandas==0.24.2 flask_cors==3.0.10 requests==2.27.1 matplotlib==2.0.2 numpy==1.16.6 python-dateutil==2.6.1 pytz==2017.2 scikit-learn==0.18.2 sphinx==1.6.3 numpydoc==0.7.0 tzwhere==2.3 pyDOE==0.3.8 netCDF4==1.4.2 cftime==1.0.4.2 pvlib==0.6.0 siphon==0.8.0 protobuf==3.17.3
+RUN pip install --user flask-restful==0.3.9 pandas==0.20.3 flask_cors==3.0.10 requests==2.27.1 matplotlib==2.0.2 numpy==1.16.6 python-dateutil==2.6.1 pytz==2017.2 scikit-learn==0.18.2 sphinx==1.6.3 numpydoc==0.7.0 tzwhere==2.3 pyDOE==0.3.8 netCDF4==1.4.2 cftime==1.0.4.2 pvlib==0.6.0 siphon==0.8.0 protobuf==3.17.3
 
 RUN mkdir models && \
     mkdir doc
