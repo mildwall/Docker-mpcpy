@@ -11,7 +11,7 @@ ENV MODELICAPATH $JMODELICA_HOME/ThirdParty/MSL
 
 USER root
 # Edit pyfmi to event update at start of simulation for ME2
-RUN sed -i "350 i \\\n        if isinstance(self.model, fmi.FMUModelME2):\n            self.model.event_update()" $JMODELICA_HOME/Python/pyfmi/fmi_algorithm_drivers.py
+# RUN sed -i "350 i \\\n        if isinstance(self.model, fmi.FMUModelME2):\n            self.model.event_update()" $JMODELICA_HOME/Python/pyfmi/fmi_algorithm_drivers.py
 
 USER developer
 
@@ -32,8 +32,29 @@ RUN apt-get -y install libgeos-dev && apt-get -qq -y install libgeos-dev
 
 RUN apt-get -y install git && apt-get -qq -y install git
 
-ENV PYTHONPATH $PYTHONPATH:$HOME
+RUN git clone https://github.com/lbl-srg/EstimationPy.git \
+    && git clone https://github.com/lbl-srg/MPCPy.git
 
-CMD python restapi.py && bash
+ENV ROOT_DIR /usr/local
+
+WORKDIR $HOME
+
+RUN mkdir $HOME/MODELICAPATH && mkdir git && \
+    cd git && \
+    git clone https://github.com/lbl-srg/modelica-buildings.git && cd modelica-buildings && git checkout 891d0c21cdbed09e7eaed0e0196ba02f85e6bc8e && cd .. && \
+    ln -s $HOME/git/modelica-buildings/Buildings $HOME/MODELICAPATH/Buildings && \
+    ln -s $ROOT_DIR/JModelica/ThirdParty/MSL/Modelica $HOME/MODELICAPATH/Modelica && \
+    ln -s $ROOT_DIR/JModelica/ThirdParty/MSL/ModelicaServices $HOME/MODELICAPATH/ModelicaServices && \
+    ln -s $ROOT_DIR/JModelica/ThirdParty/MSL/Complex.mo $HOME/MODELICAPATH/Complex.mo
+ENV MODELICAPATH $HOME/MODELICAPATH:$ROOT_DIR/JModelica/ThirdParty/MSL
+
+WORKDIR $ROOT_DIR
+
+ENV PYTHONPATH $PYTHONPATH:$HOME/EstimationPy:$HOME/MPCPy 
+
+# Replace 'solver_object.output' with 'solver_object.getOutput' in all .py files throughout the entire image
+RUN find / -type f -name "*.py" -exec sed -i 's/solver_object.output/solver_object.getOutput/g' {} +
+
+# CMD python restapi.py && bash
 
 EXPOSE 5000
