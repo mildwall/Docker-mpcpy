@@ -66,7 +66,7 @@ RUN cd $ROOT_DIR && \
     cd $ROOT_DIR/Ipopt-3.12.4/ThirdParty/Metis && \
     ./get.Metis 
     
-COPY ./coinhsl-2021.05.05 $IPOPT_HOME/include/coin/ThirdParty
+COPY ./coinhsl-2021.05.05 $ROOT_DIR/Ipopt-3.12.4/ThirdParty/HSL
 
 RUN cd $ROOT_DIR/Ipopt-3.12.4/ThirdParty/HSL && \
     mv coinhsl-2021.05.05 coinhsl && \
