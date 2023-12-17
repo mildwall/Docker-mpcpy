@@ -66,8 +66,10 @@ RUN cd $ROOT_DIR && \
     cd $ROOT_DIR/Ipopt-3.12.4/ThirdParty/Lapack && \
     ./get.Lapack && \
     cd $ROOT_DIR/Ipopt-3.12.4/ThirdParty && \
+    rm -r Mumps && \
     git clone https://github.com/coin-or-tools/ThirdParty-Mumps.git &&\
-    cd ThirdParty-Mumps && \
+    mv ThirdParty-Mumps Mumps && \
+    cd Mumps && \
     ./get.Mumps && \
     ./configure && \
     make && \
