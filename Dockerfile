@@ -55,31 +55,42 @@ ENV PYTHONPATH $PYTHONPATH:$HOME/EstimationPy:$HOME/MPCPy
 # Replace 'solver_object.output' with 'solver_object.getOutput' in all .py files throughout the entire image
 RUN find / -type f -name "*.py" -exec sed -i 's/solver_object.output/solver_object.getOutput/g' {} +
 
+RUN apt-get -y install pkg-config && apt-get -qq -y install pkg-config
+RUN apt-get -y install liblapack-dev && apt-get -qq -y install liblapack-dev
+RUN apt-get -y install libmetis-dev && apt-get -qq -y install libmetis-dev
+
 RUN cd $ROOT_DIR && \
     wget wget -O - http://www.coin-or.org/download/source/Ipopt/Ipopt-3.12.4.tgz | tar xzf - && \
     cd $ROOT_DIR/Ipopt-3.12.4/ThirdParty/Blas && \
     ./get.Blas && \
     cd $ROOT_DIR/Ipopt-3.12.4/ThirdParty/Lapack && \
     ./get.Lapack && \
-    cd $ROOT_DIR/Ipopt-3.12.4/ThirdParty/Mumps && \
+    cd $ROOT_DIR/Ipopt-3.12.4/ThirdParty && \
+    git clone https://github.com/coin-or-tools/ThirdParty-Mumps.git &&\
+    cd ThirdParty-Mumps && \
     ./get.Mumps && \
+    ./configure && \
+    make && \
+    make install && \
     cd $ROOT_DIR/Ipopt-3.12.4/ThirdParty/Metis && \
-    ./get.Metis 
-    
-COPY ./coinhsl-2021.05.05 $ROOT_DIR/Ipopt-3.12.4/ThirdParty/HSL
+    ./get.Metis && \
+    cd $ROOT_DIR/Ipopt-3.12.4/ThirdParty &&\
+    git clone https://github.com/coin-or-tools/ThirdParty-HSL.git
 
-RUN cd $ROOT_DIR/Ipopt-3.12.4/ThirdParty/HSL && \
+COPY ./coinhsl.tar.gz $ROOT_DIR/Ipopt-3.12.4/ThirdParty/ThirdParty-HSL
+
+RUN cd $ROOT_DIR/Ipopt-3.12.4/ThirdParty/ThirdParty-HSL && \
+    tar xvf coinhsl.tar.gz && \
     mv coinhsl-2021.05.05 coinhsl && \
-    cd coinhsl && \
-    mkdir build && \
-    cd build && \
-    ../configure --prefix=$IPOPT_HOME && \
-    find $IPOPT_HOME/ThirdParty/HSL/coinhsl/build -type f -name "Makefile" -exec sed -i 's/aclocal-1.14/aclocal-1.15/g' {} + &&\
-    find $IPOPT_HOME/ThirdParty/HSL/coinhsl/build -type f -name "Makefile" -exec sed -i 's/automake-1.14/automake-1.15/g' {} + &&\
+    ./configure --prefix=$IPOPT_HOME && \
+    #find $IPOPT_HOME/ThirdParty/HSL/coinhsl/build -type f -name "Makefile" -exec sed -i 's/aclocal-1.14/aclocal-1.15/g' {} + &&\
+    #find $IPOPT_HOME/ThirdParty/HSL/coinhsl/build -type f -name "Makefile" -exec sed -i 's/automake-1.14/automake-1.15/g' {} + &&\
     make &&\
     make install &&\
     cd $ROOT_DIR/Ipopt-3.12.4 && \
-    ./configure --prefix=/usr/local/Ipopt-3.12.4 && \
+    mkdir build &&\
+    cd build && \
+    ../configure --prefix=/usr/local/Ipopt-3.12.4 && \
     make install 
 
 ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:$IPOPT_HOME/lib:$JMODELICA_HOME/ThirdParty/CasADi/lib:$SUNDIALS_HOME/lib
