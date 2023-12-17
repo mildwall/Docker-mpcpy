@@ -15,9 +15,9 @@ USER root
 
 WORKDIR $ROOT_DIR
 
-RUN apt-get -y install pkg-config && apt-get -qq -y install pkg-config
-RUN apt-get -y install liblapack-dev && apt-get -qq -y install liblapack-dev
-RUN apt-get -y install libmetis-dev && apt-get -qq -y install libmetis-dev
+RUN apt-get -y install pkg-config && apt-get -qq -y install pkg-config && \
+    apt-get -y install liblapack-dev && apt-get -qq -y install liblapack-dev && \
+    apt-get -y install libmetis-dev && apt-get -qq -y install libmetis-dev
 
 RUN cd $ROOT_DIR && \
     wget wget -O - http://www.coin-or.org/download/source/Ipopt/Ipopt-3.12.4.tgz | tar xzf - && \
@@ -55,34 +55,36 @@ RUN cd $ROOT_DIR/Ipopt-3.12.4/ThirdParty/ThirdParty-HSL && \
     ../configure --prefix=/usr/local/Ipopt-3.12.4 && \
     make install 
 
-# Replace 'solver_object.output' with 'solver_object.getOutput' in all .py files throughout the entire image
-RUN find / -type f -name "*.py" -exec sed -i 's/solver_object.output/solver_object.getOutput/g' {} +
+# Replace 'solver_object.output' with 'solver_object.getOutput' in all .py files throughout the entire image and miniconda install
+RUN find / -type f -name "*.py" -exec sed -i 's/solver_object.output/solver_object.getOutput/g' {} + && \
+    mkdir -p ~/miniconda3 && \
+    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh && \
+    bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3 && \
+    rm -rf ~/miniconda3/miniconda.sh && \
+    ~/miniconda3/bin/conda init bash && \
+    ~/miniconda3/bin/conda init zsh
 
-USER developer
+# Create conda environment
+COPY ./py27.yml ~
+COPY ./py310.yml ~
+
+RUN conda env create -f ~/py27.yml -n py27 && \
+    conda env create -f ~/py310.yml -n py310 && \
+    conda activate py27 && \
+    conda -y install scikit-learn=0.18.2
 
 WORKDIR $HOME
 
-RUN pip install --user flask-restful==0.3.9 pandas==0.20.3 flask_cors==3.0.10 requests==2.27.1 matplotlib==2.0.2 numpy==1.16.6 python-dateutil==2.6.1 pytz==2017.2 scikit-learn==0.18.2 sphinx==1.6.3 numpydoc==0.7.0 tzwhere==2.3 pyDOE==0.3.8 netCDF4==1.4.2 cftime==1.0.4.2 pvlib==0.6.0 siphon==0.8.0 protobuf==3.17.3
+RUN pip install --user flask-restful==0.3.9 flask_cors==3.0.10  tzwhere==2.3 pyDOE==0.3.8 pvlib==0.6.0 siphon==0.8.0 protobuf==3.17.3
 
 RUN mkdir models && \
-    mkdir doc
-
-USER root
-
-RUN apt-get -y update && apt-get -y install curl && apt-get -qq -y install curl
-
-RUN apt-get -y install nano && apt-get -qq -y install nano
-
-RUN apt-get -y install libgeos-dev && apt-get -qq -y install libgeos-dev
-
-RUN apt-get -y install git && apt-get -qq -y install git
-
-RUN git clone https://github.com/lbl-srg/EstimationPy.git \
-    && git clone https://github.com/lbl-srg/MPCPy.git
-
-ENV ROOT_DIR /usr/local
-
-WORKDIR $HOME
+    mkdir doc && \
+    apt-get -y update && apt-get -y install curl && apt-get -qq -y install curl && \
+    apt-get -y install nano && apt-get -qq -y install nano && \
+    apt-get -y install libgeos-dev && apt-get -qq -y install libgeos-dev && \
+    apt-get -y install git && apt-get -qq -y install git && \
+    git clone https://github.com/lbl-srg/EstimationPy.git && \
+    git clone https://github.com/lbl-srg/MPCPy.git
 
 RUN mkdir $HOME/MODELICAPATH && mkdir git && \
     cd git && \
