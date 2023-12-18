@@ -76,9 +76,8 @@ WORKDIR $HOME
 
 RUN ~/miniconda3/bin/conda env create -f ~/py27.yml -n py27 && \
     ~/miniconda3/bin/conda env create -f ~/py310.yml -n py310 && \
-    /bin/bash -c "source ~/miniconda3/bin/activate py27"
-
-RUN pip install --user flask-restful==0.3.9 flask_cors==3.0.10 scikit-learn==0.18.2 tzwhere==2.3 pyDOE==0.3.8 pvlib==0.6.0 siphon==0.8.0 protobuf==3.17.3
+    /bin/bash -c "source ~/miniconda3/bin/activate py27" && \
+    ~/miniconda3/envs/py27/bin/pip install flask-restful==0.3.9 flask_cors==3.0.10 scikit-learn==0.18.2 tzwhere==2.3 pyDOE==0.3.8 pvlib==0.6.0 siphon==0.8.0 protobuf==3.17.3
 
 RUN mkdir models && \
     mkdir doc && \
