@@ -69,17 +69,16 @@ RUN find / -type f -name "*.py" -exec sed -i 's/solver_object.output/solver_obje
     ~/miniconda3/bin/conda init zsh
 
 # Create conda environment
-COPY ./py27.yml ~
-COPY ./py310.yml ~
-
-RUN conda env create -f ~/py27.yml -n py27 && \
-    conda env create -f ~/py310.yml -n py310 && \
-    conda activate py27 && \
-    conda -y install scikit-learn=0.18.2
+COPY py27.yml /home/developer
+COPY py310.yml /home/developer
 
 WORKDIR $HOME
 
-RUN pip install --user flask-restful==0.3.9 flask_cors==3.0.10  tzwhere==2.3 pyDOE==0.3.8 pvlib==0.6.0 siphon==0.8.0 protobuf==3.17.3
+RUN ~/miniconda3/bin/conda env create -f ~/py27.yml -n py27 && \
+    ~/miniconda3/bin/conda env create -f ~/py310.yml -n py310 && \
+    /bin/bash -c "source ~/miniconda3/bin/activate py27"
+
+RUN pip install --user flask-restful==0.3.9 flask_cors==3.0.10 scikit-learn==0.18.2 tzwhere==2.3 pyDOE==0.3.8 pvlib==0.6.0 siphon==0.8.0 protobuf==3.17.3
 
 RUN mkdir models && \
     mkdir doc && \
