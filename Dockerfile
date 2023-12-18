@@ -15,7 +15,11 @@ USER root
 
 WORKDIR $ROOT_DIR
 
-RUN apt-get -y install pkg-config && apt-get -qq -y install pkg-config && \
+RUN apt-get -y update && apt-get -y install curl && apt-get -qq -y install curl && \
+    apt-get -y install nano && apt-get -qq -y install nano && \
+    apt-get -y install libgeos-dev && apt-get -qq -y install libgeos-dev && \
+    apt-get -y install git && apt-get -qq -y install git && \
+    apt-get -y install pkg-config && apt-get -qq -y install pkg-config && \
     apt-get -y install liblapack-dev && apt-get -qq -y install liblapack-dev && \
     apt-get -y install libmetis-dev && apt-get -qq -y install libmetis-dev
 
@@ -79,10 +83,6 @@ RUN pip install --user flask-restful==0.3.9 flask_cors==3.0.10  tzwhere==2.3 pyD
 
 RUN mkdir models && \
     mkdir doc && \
-    apt-get -y update && apt-get -y install curl && apt-get -qq -y install curl && \
-    apt-get -y install nano && apt-get -qq -y install nano && \
-    apt-get -y install libgeos-dev && apt-get -qq -y install libgeos-dev && \
-    apt-get -y install git && apt-get -qq -y install git && \
     git clone https://github.com/lbl-srg/EstimationPy.git && \
     git clone https://github.com/lbl-srg/MPCPy.git
 
