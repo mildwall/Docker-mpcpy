@@ -1,4 +1,4 @@
-FROM michaelwetter/ubuntu-1804_jmodelica_trunk
+FROM lbnlblum/ubuntu-1804_jmodelica_trunk
 
 # Environment variables
 ENV ROOT_DIR /usr/local
